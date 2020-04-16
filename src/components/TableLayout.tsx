@@ -1,6 +1,8 @@
 import * as React from 'react'
 import { Table } from 'antd';
 
+const { Column } = Table;
+
 interface IProps {
   updateFavorites: (favorites: React.ReactText[]) => any
   dataSource: any,
@@ -27,11 +29,14 @@ class TableLayout extends React.PureComponent<IProps, IState> {
           onChange: this.onChangeFavorite
         }}
         dataSource={dataSource}
-        columns={columns}
         pagination={false}
-        scroll={{ y: 600 }}
+        scroll={{ y: 400 }}
         style={{ width: 500 }}
-      />
+      >
+        {columns.map((column: any, index: number) => (
+          <Column title={column.title} dataIndex={column.dataIndex} key={column.key} render={column.render} sorter={column.sorter} />
+        ))}
+      </Table>
     )
   }
 }

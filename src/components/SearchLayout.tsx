@@ -20,7 +20,9 @@ class SearchLayout extends React.PureComponent<IProps, IState> {
     return (
       <Search
         placeholder="Search"
-        onSearch={this.onSearch}
+        onChange={(e) => {
+          this.onSearch(e.target.value)
+        }}
         defaultValue={this.props.search}
         style={{ width: 200 }}
       />

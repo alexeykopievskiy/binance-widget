@@ -1,10 +1,11 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
+import styled from 'styled-components';
 
 import { getBinanceData } from '../services';
 import { saveProducts, saveFilters, saveIndicatorType, saveSearch, updateFavorites } from '../ducks/data'
-import { wsConnect, wsForceDisconnect } from '../ducks/socket'
+import { wsConnect } from '../ducks/socket'
 import { Models, Enums } from '../interfaces'
 
 import FilterLayout from "../components/FilterLayout";
@@ -12,7 +13,6 @@ import TabsLayout from "../components/TabsLayout";
 import SearchLayout from "../components/SearchLayout";
 import IndicatorLayout from "../components/IndicatorLayout";
 import TableLayout from "../components/TableLayout";
-import WSCloseConnectionButton from "../components/WSCloseConnectionButton";
 import { getPreparedData } from "../utils";
 
 interface IProps {
@@ -22,7 +22,6 @@ interface IProps {
   saveIndicatorType: (IndicatorType: any) => any
   saveSearch: (search: any) => any
   wsConnect: () => any
-  wsForceDisconnect: () => any
   products?: any,
   filters?: any,
   IndicatorType?: string,
@@ -31,6 +30,23 @@ interface IProps {
   wsIsConnecting?: boolean,
   favoriteKeys: React.ReactText[]
 }
+
+const Container = styled.div`
+  margin: auto;
+  border: 1px solid #eee;
+`;
+
+const FilterContainer = styled.div`
+  padding: 10px;
+`;
+
+const Green = styled.span`
+  color: green;
+`;
+
+const Red = styled.span`
+  color: red;
+`;
 
 class MarketContainer extends Component<IProps, {}> {
 
@@ -53,6 +69,10 @@ class MarketContainer extends Component<IProps, {}> {
     if (!wsIsConnected && !wsIsConnecting) {
       this.props.wsConnect();
     }
+  }
+
+  filterChange = (change: string) => {
+    return (change.startsWith('+') ? <Green>{change}</Green> : <Red>{change}</Red>)
   }
 
   getColumns = (IndicatorType?: string) => {
@@ -88,7 +108,7 @@ class MarketContainer extends Component<IProps, {}> {
           title: 'Change',
           dataIndex: 'change',
           key: 'change',
-          render: (change: string) => <span>{change}</span>,
+          render: (change: string) => this.filterChange(change),
           sorter: (curr: any, next: any) => parseFloat(curr.change) - parseFloat(next.change)
         }
       )
@@ -98,39 +118,37 @@ class MarketContainer extends Component<IProps, {}> {
   }
 
   render() {
-    const { wsForceDisconnect, products, filters, IndicatorType, search, saveFilters, saveSearch, saveIndicatorType, updateFavorites, favoriteKeys } = this.props
+    const { products, filters, IndicatorType, search, saveFilters, saveSearch, saveIndicatorType, updateFavorites, favoriteKeys } = this.props
 
     const dataSource = getPreparedData(products, filters, search, favoriteKeys)
 
-
     return (
-      <div className="container">
-        <WSCloseConnectionButton
-          wsForceDisconnect={wsForceDisconnect}
-        />
-        <FilterLayout>
-          <TabsLayout
-            filters={filters}
-            saveFilters={saveFilters}
-          />
+      <Container>
+        <FilterContainer>
           <FilterLayout>
-            <SearchLayout
-              search={search}
-              saveSearch={saveSearch}
+            <TabsLayout
+              filters={filters}
+              saveFilters={saveFilters}
             />
-            <IndicatorLayout
-              IndicatorType={IndicatorType}
-              saveIndicatorType={saveIndicatorType}
-            />
+            <FilterLayout>
+              <SearchLayout
+                search={search}
+                saveSearch={saveSearch}
+              />
+              <IndicatorLayout
+                IndicatorType={IndicatorType}
+                saveIndicatorType={saveIndicatorType}
+              />
+            </FilterLayout>
           </FilterLayout>
-        </FilterLayout>
+        </FilterContainer>
         <TableLayout
           updateFavorites={updateFavorites}
           favoriteKeys={favoriteKeys}
           dataSource={dataSource}
           columns={this.getColumns(IndicatorType)}
         />
-      </div>
+      </Container>
     )
   }
 }
@@ -159,7 +177,6 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
   saveIndicatorType: (IndicatorType: string) => saveIndicatorType(IndicatorType, dispatch),
   saveSearch: (search: string) => saveSearch(search, dispatch),
   wsConnect: () => wsConnect(dispatch),
-  wsForceDisconnect: () => wsForceDisconnect(dispatch),
 })
 
 export default connect(

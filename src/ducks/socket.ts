@@ -5,9 +5,6 @@ export const ActionTypes = {
   WS_CONNECT: 'WS_CONNECT',
   WS_CONNECTING: 'WS_CONNECTING',
   WS_CONNECTED: 'WS_CONNECTED',
-  WS_DISCONNECT: 'WS_DISCONNECT',
-  WS_DISCONNECTED: 'WS_DISCONNECTED',
-  WS_FORCE_DISCONNECT: 'WS_FORCE_DISCONNECT',
 }
 
 const initialState = {
@@ -23,15 +20,6 @@ export const wsConnecting = (dispatch: Dispatch) => {
 };
 export const wsConnected = (dispatch: Dispatch) => {
   dispatch({ type: ActionTypes.WS_CONNECTED })
-};
-export const wsDisconnect = (dispatch: Dispatch) => {
-  dispatch({ type: ActionTypes.WS_DISCONNECT })
-};
-export const wsDisconnected = (dispatch: Dispatch) => {
-  dispatch({ type: ActionTypes.WS_DISCONNECTED })
-};
-export const wsForceDisconnect = (dispatch: Dispatch) => {
-  dispatch({ type: ActionTypes.WS_FORCE_DISCONNECT })
 };
 
 const websocketReducer = (state = initialState, action: Models.IAction) => {
@@ -50,20 +38,6 @@ const websocketReducer = (state = initialState, action: Models.IAction) => {
       };
     case ActionTypes.WS_CONNECT:
       return { ...state };
-    case ActionTypes.WS_DISCONNECT:
-      return { ...state };
-    case ActionTypes.WS_DISCONNECTED:
-      return {
-        ...state,
-        wsIsConnecting: false,
-        wsIsConnected: false,
-      };
-    case ActionTypes.WS_FORCE_DISCONNECT:
-      return {
-        ...state,
-        wsIsConnecting: false,
-        wsIsConnected: false,
-      };
     default:
       return state;
   }

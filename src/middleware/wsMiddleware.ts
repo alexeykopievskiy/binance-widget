@@ -1,4 +1,4 @@
-import { ActionTypes, wsConnected, wsConnecting, wsDisconnected } from '../ducks/socket';
+import { ActionTypes, wsConnected, wsConnecting } from '../ducks/socket';
 import { updateProducts } from '../ducks/data';
 import { Models } from "../interfaces"
 import { WS_URL } from "../config"
@@ -7,7 +7,6 @@ import { Dispatch } from "redux";
 const WS_CLOSE_CODES = {
   WS_NORMAL_CLOSE: 1000,
   WS_ABNORMAL_CLOSE: 1006,
-  WS_FORCE_DISCONNECT: 4000
 }
 
 const wsMiddleware = () => {
@@ -19,7 +18,6 @@ const wsMiddleware = () => {
 
   const onClose = (dispatch: Dispatch) => ({ code }: { code: number }) => {
     if ([WS_CLOSE_CODES.WS_NORMAL_CLOSE, WS_CLOSE_CODES.WS_ABNORMAL_CLOSE].includes(code)) {
-      wsDisconnected(dispatch);
       return;
     }
 
@@ -63,18 +61,6 @@ const wsMiddleware = () => {
 
         openWSConnection(dispatch);
 
-        break;
-      case ActionTypes.WS_DISCONNECT:
-        if (socket !== null) {
-          socket.close(WS_CLOSE_CODES.WS_NORMAL_CLOSE);
-        }
-        socket = null;
-        break;
-      case ActionTypes.WS_FORCE_DISCONNECT:
-        if (socket !== null) {
-          socket.close(WS_CLOSE_CODES.WS_FORCE_DISCONNECT);
-        }
-        socket = null;
         break;
       default:
         return next(action);
